@@ -9,7 +9,7 @@
 
 ![CISA KEV Browser — Dark Mode](docs/screenshot-dark.png)
 
-**Detail modal** — full metadata, required action, reference links, and prev/next navigation
+**Detail model** — full metadata, required action, reference links, and prev/next navigation
 
 ![CISA KEV Browser — Detail Modal](docs/screenshot-modal-dark.png)
 
