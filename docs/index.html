@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CISA KEV Browser — Project Documentation</title>
+<meta name="description" content="Standalone offline browser for the CISA Known Exploited Vulnerabilities catalog. No server, no install — open in any browser."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg:        #0b0f18;
+  --surface:   #111827;
+  --surface2:  #1a2234;
+  --surface3:  #1e2d45;
+  --border:    #1e2d45;
+  --text:      #e2e8f0;
+  --text-m:    #94a3b8;
+  --text-f:    #475569;
+  --primary:   #60a5fa;
+  --primary-d: #3b82f6;
+  --primary-hi:#1e3a5f;
+  --danger:    #f87171;
+  --warn:      #fbbf24;
+  --success:   #4ade80;
+  --code:      #38bdf8;
+  --code-bg:   #0c1929;
+  --font:      'Geist','Inter',system-ui,sans-serif;
+  --mono:      'JetBrains Mono','Fira Code',monospace;
+  --r:         .5rem;
+  --r-lg:      .75rem;
+  --r-xl:      1.25rem;
+  --sh:        0 4px 24px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);
+  font-size:clamp(.875rem,.83rem + .2vw,.9375rem);line-height:1.7}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:50;background:rgba(11,15,24,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 2rem;height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-brand{display:flex;align-items:center;gap:.625rem}
+.nav-logo{width:28px;height:28px;color:var(--primary)}
+.nav-title{font-size:1rem;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{font-size:.8125rem;font-weight:500;color:var(--text-m);transition:color .15s}
+.nav-links a:hover{color:var(--primary);text-decoration:none}
+.nav-cta{display:flex;align-items:center;gap:.35rem;font-size:.8125rem;font-weight:600;
+  padding:.375rem .875rem;border-radius:var(--r);
+  background:var(--primary-d);color:#fff;transition:background .15s}
+.nav-cta:hover{background:var(--primary);text-decoration:none}
+
+/* ── HERO ── */
+.hero{max-width:1100px;margin:0 auto;padding:5rem 2rem 4rem;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;
+  font-weight:600;color:var(--success);background:rgba(74,222,128,.08);
+  border:1px solid rgba(74,222,128,.25);border-radius:999px;
+  padding:.3rem .875rem;margin-bottom:1.5rem;letter-spacing:.04em;text-transform:uppercase}
+.hero-badge svg{width:12px;height:12px}
+h1{font-size:clamp(2rem,4vw,3.25rem);font-weight:700;letter-spacing:-.03em;
+  line-height:1.1;margin-bottom:1.25rem}
+h1 span{color:var(--primary)}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.125rem);color:var(--text-m);
+  max-width:600px;margin:0 auto 2.5rem;line-height:1.7}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:.5rem;font-size:.9375rem;
+  font-weight:600;padding:.75rem 1.75rem;border-radius:var(--r);
+  background:var(--primary-d);color:#fff;transition:all .15s}
+.btn-primary:hover{background:var(--primary);text-decoration:none;
+  transform:translateY(-1px);box-shadow:0 4px 16px rgba(96,165,250,.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:.5rem;font-size:.9375rem;
+  font-weight:500;padding:.75rem 1.75rem;border-radius:var(--r);
+  border:1px solid var(--border);color:var(--text-m);transition:all .15s}
+.btn-secondary:hover{color:var(--primary);border-color:var(--primary);
+  text-decoration:none;background:var(--primary-hi)}
+
+/* ── STAT PILLS ── */
+.hero-stats{display:flex;justify-content:center;gap:2.5rem;
+  margin-top:3.5rem;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-val{font-size:1.75rem;font-weight:700;font-family:var(--mono);
+  letter-spacing:-.02em;line-height:1}
+.hstat-val.blue{color:var(--primary)}
+.hstat-val.red{color:var(--danger)}
+.hstat-val.amber{color:var(--warn)}
+.hstat-val.green{color:var(--success)}
+.hstat-lbl{font-size:.75rem;color:var(--text-f);text-transform:uppercase;
+  letter-spacing:.06em;margin-top:.3rem}
+
+/* ── SECTION ── */
+section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
+.section-label{font-size:.75rem;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+h2{font-size:clamp(1.375rem,2.5vw,1.875rem);font-weight:700;
+  letter-spacing:-.02em;margin-bottom:1rem}
+.section-body{color:var(--text-m);max-width:700px;line-height:1.8}
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+
+/* ── HOW IT WORKS ── */
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2.5rem}
+@media(max-width:700px){.how-grid{grid-template-columns:1fr}}
+.how-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:1.75rem;transition:border-color .2s}
+.how-card:hover{border-color:var(--primary)}
+.how-num{font-size:.6875rem;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.how-title{font-size:1.0625rem;font-weight:700;margin-bottom:.5rem;letter-spacing:-.01em}
+.how-body{font-size:.875rem;color:var(--text-m);line-height:1.75}
+.how-code{font-family:var(--mono);font-size:.75rem;color:var(--code);
+  background:var(--code-bg);border:1px solid rgba(56,189,248,.15);
+  border-radius:.375rem;padding:.625rem .875rem;margin-top:.875rem;
+  overflow-x:auto;white-space:pre}
+
+/* ── DIAGRAM ── */
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:2rem;margin-top:2rem;overflow-x:auto}
+.diagram-wrap .mermaid{display:flex;justify-content:center}
+
+/* ── FEATURES ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.25rem;margin-top:2.5rem}
+.feat-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:1.5rem;transition:border-color .2s}
+.feat-card:hover{border-color:var(--primary)}
+.feat-icon{font-size:1.5rem;margin-bottom:.875rem}
+.feat-title{font-size:.9375rem;font-weight:700;margin-bottom:.375rem;letter-spacing:-.01em}
+.feat-body{font-size:.8125rem;color:var(--text-m);line-height:1.7}
+
+/* ── FILE BREAKDOWN ── */
+.file-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem}
+@media(max-width:700px){.file-grid{grid-template-columns:1fr}}
+.file-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-xl);padding:1.75rem}
+.file-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
+.file-icon{width:40px;height:40px;border-radius:.5rem;display:flex;
+  align-items:center;justify-content:center;font-size:1.125rem;flex-shrink:0}
+.file-icon.py{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.2)}
+.file-icon.html{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2)}
+.file-name{font-family:var(--mono);font-size:.9375rem;font-weight:600;color:var(--text)}
+.file-size{font-size:.75rem;color:var(--text-f);margin-top:.1rem}
+.file-responsibilities{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.file-responsibilities li{display:flex;gap:.625rem;font-size:.8125rem;color:var(--text-m)}
+.file-responsibilities li::before{content:"›";color:var(--primary);flex-shrink:0;
+  font-weight:700;margin-top:.05rem}
+
+/* ── DATA FLOW TABLE ── */
+.flow-table{width:100%;border-collapse:collapse;margin-top:2rem;font-size:.875rem}
+.flow-table th{padding:.625rem 1rem;text-align:left;font-size:.6875rem;font-weight:700;
+  color:var(--text-m);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);background:var(--surface)}
+.flow-table td{padding:.625rem 1rem;border-bottom:1px solid rgba(30,45,69,.6);
+  vertical-align:top;color:var(--text-m)}
+.flow-table tr:last-child td{border-bottom:none}
+.flow-table td:first-child{font-family:var(--mono);font-size:.8125rem;color:var(--code);
+  white-space:nowrap}
+.flow-table tr:hover td{background:var(--surface2)}
+code{font-family:var(--mono);font-size:.8125rem;color:var(--code);
+  background:var(--code-bg);padding:.1rem .375rem;border-radius:.25rem}
+
+/* ── QUICK START ── */
+.qs-steps{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
+.qs-step{display:flex;gap:1.25rem;align-items:flex-start}
+.qs-num{width:28px;height:28px;border-radius:999px;background:var(--primary-d);
+  color:#fff;font-size:.8125rem;font-weight:700;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:.1rem}
+.qs-content{flex:1}
+.qs-title{font-weight:600;font-size:.9375rem;margin-bottom:.375rem}
+.qs-body{font-size:.875rem;color:var(--text-m)}
+.code-block{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:1rem 1.25rem;margin-top:.625rem;
+  font-family:var(--mono);font-size:.8125rem;color:var(--code);
+  overflow-x:auto;white-space:pre;line-height:1.6}
+.code-comment{color:var(--text-f)}
+
+/* ── KEYBOARD ── */
+.kbd-grid{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.kbd-item{display:flex;align-items:center;gap:.75rem;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:.625rem 1rem;font-size:.8125rem}
+kbd{font-family:var(--mono);font-size:.75rem;font-weight:600;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:.25rem;padding:.15rem .5rem;color:var(--text)}
+.kbd-desc{color:var(--text-m)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;
+  font-size:.8125rem;color:var(--text-f)}
+footer a{color:var(--text-m)}footer a:hover{color:var(--primary)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 36 36" fill="none" aria-label="Shield">
+        <rect width="36" height="36" rx="8" fill="currentColor"/>
+        <path d="M18 6L30 12V20C30 26.6 24.8 31.8 18 33C11.2 31.8 6 26.6 6 20V12L18 6Z"
+          fill="none" stroke="#0b0f18" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M13 18L16.5 21.5L23 15" stroke="#0b0f18" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-title">CISA KEV Browser</span>
+    </div>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#diagram">Diagram</a>
+      <a href="#features">Features</a>
+      <a href="#quickstart">Quick Start</a>
+    </div>
+    <a class="nav-cta" href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      CISA Catalog
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Standalone · Offline · No Install
+  </div>
+  <h1>Browse the <span>CISA KEV</span> Catalog<br/>Without a Server</h1>
+  <p class="hero-sub">
+    A self-contained HTML app with all Known Exploited Vulnerabilities embedded inline.
+    Run <code>build.py</code> to pull the latest data — then open the HTML in any browser, anywhere.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="#quickstart">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      Get Started
+    </a>
+    <a class="btn-secondary" href="#diagram">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>
+      View Architecture
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val blue">1,558+</div>
+      <div class="hstat-lbl">KEVs Tracked</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val red">313</div>
+      <div class="hstat-lbl">Ransomware Known</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val amber">1,553</div>
+      <div class="hstat-lbl">Past Due Date</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val green">0</div>
+      <div class="hstat-lbl">Dependencies</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-label">Overview</div>
+  <h2>How It Works</h2>
+  <p class="section-body">
+    The project is two files. <code>build.py</code> is a Python script that fetches
+    the latest KEV JSON from CISA's live feed and bakes every vulnerability record
+    directly into a standalone HTML file. The resulting <code>cisa-kev-browser.html</code>
+    needs no server, no network connection, and no dependencies to run.
+  </p>
+
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">Step 1 — build.py</div>
+      <div class="how-title">Fetch &amp; Validate</div>
+      <div class="how-body">
+        Downloads the CISA KEV JSON feed with aggressive cache-busting headers
+        to defeat CDN caching. Verifies the payload is complete by cross-checking
+        the declared <code>count</code> field against actual entries received.
+        Sorts all vulnerabilities newest-first before embedding.
+      </div>
+      <div class="how-code"><span style="color:#94a3b8"># Cache-busting URL on every run</span>
+URL = CISA_URL + f"?_={timestamp}&nocache={nonce}"
+
+headers = {
+  "Cache-Control": "no-cache, no-store",
+  "Pragma":        "no-cache",
+  "Expires":       "0"
+}</div>
+    </div>
+
+    <div class="how-card">
+      <div class="how-num">Step 1 — build.py</div>
+      <div class="how-title">Inject &amp; Build</div>
+      <div class="how-body">
+        Takes the validated JSON and injects it as a JavaScript constant directly
+        into the HTML template. Replaces placeholder tokens for catalog version,
+        release date, and entry count. Writes the final file in one shot.
+        The output is fully self-contained — no external requests at runtime.
+      </div>
+      <div class="how-code"><span style="color:#94a3b8"># Injection into HTML template</span>
+html = TEMPLATE
+html = html.replace("__CATALOG_JSON__", json_str)
+html = html.replace("__CATALOG_VERSION__", version)
+html = html.replace("__RELEASE_DATE__", released)
+
+with open("cisa-kev-browser.html", "w") as f:
+    f.write(html)</div>
+    </div>
+
+    <div class="how-card">
+      <div class="how-num">Step 2 — browser</div>
+      <div class="how-title">Initialize the App</div>
+      <div class="how-body">
+        When you open the HTML, the browser reads the embedded
+        <code>CATALOG</code> constant — no network call needed.
+        It populates the vendor and CWE dropdowns, displays the latest
+        entry date in the stats bar, and renders the first page of results instantly.
+      </div>
+      <div class="how-code"><span style="color:#94a3b8">// Embedded at build time — no fetch needed</span>
+const CATALOG = { ...1,558 KEVs... };
+
+(function init() {
+  populateVendorDropdown();
+  populateCWEDropdown();
+  showLatestEntry(CATALOG.vulnerabilities[0]);
+  applyFilters();  // → renderPage()
+})();</div>
+    </div>
+
+    <div class="how-card">
+      <div class="how-num">Step 2 — browser</div>
+      <div class="how-title">Filter, Sort &amp; Explore</div>
+      <div class="how-body">
+        All filtering and sorting happens in-memory in the browser — instant,
+        with no round trips. The full-text search covers CVE ID, vendor,
+        product, description, CWE codes, and notes simultaneously.
+        Clicking any CVE opens a full detail modal with references and navigation.
+      </div>
+      <div class="how-code"><span style="color:#94a3b8">// applyFilters() pipeline</span>
+let list = CATALOG.vulnerabilities;
+list = textSearch(list, filters.search);
+list = filterByVendor(list, filters.vendor);
+list = filterByRansomware(list, filters.ransomware);
+list = filterByCWE(list, filters.cwe);
+list = filterByDateRange(list, from, to);
+list = sort(list, sortBy, sortDir);
+renderPage(list, pageNumber);</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ARCHITECTURE DIAGRAM -->
+<section id="diagram">
+  <div class="section-label">Architecture</div>
+  <h2>Functionality Diagram</h2>
+  <p class="section-body">
+    End-to-end data flow from CISA's CDN through <code>build.py</code>
+    into the standalone HTML app and its interactive UI layers.
+  </p>
+
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart TD
+    CISA["🌐 CISA CDN\nknown_exploited_vulnerabilities.json"]
+
+    subgraph BP["build.py — Run once to update"]
+        direction TB
+        F1["fetch_kev()\nTimestamp + nonce URL\nno-cache headers\nFresh SSL context"]
+        F2["Validate payload\ncount check\nnon-empty check"]
+        F3["Sort newest-first\ndateAdded desc"]
+        F4["build()\nInject JSON into\nHTML template"]
+        F5["Write\ncisa-kev-browser.html"]
+        F1 --> F2 --> F3 --> F4 --> F5
+    end
+
+    subgraph HTML["cisa-kev-browser.html — Open in any browser"]
+        direction TB
+        D1["const CATALOG = {...}\n1,558 KEVs embedded inline"]
+        D2["init()\nPopulate dropdowns\nShow latest entry stat"]
+
+        subgraph UI["Interactive UI"]
+            direction LR
+            SF["🔍 Search\nCVE · vendor · product\ndescription · CWE · notes"]
+            FF["🎛 Filters\nvendor · ransomware\nCWE · date range"]
+            SF & FF --> AF["applyFilters()\n+ sort()"]
+        end
+
+        subgraph TABLE["Data Table"]
+            direction TB
+            T1["renderPage()\n50 rows per page"]
+            T2["Pagination\n← prev / next →"]
+            T1 --> T2
+        end
+
+        subgraph MODAL["Detail Modal"]
+            direction TB
+            M1["Full metadata\nvendor · product · dates"]
+            M2["Description\nRequired Action\nReferences (NVD · CISA · vendor)"]
+            M3["← Prev CVE    Next CVE →\nKeyboard: ←  →  Esc"]
+        end
+
+        D1 --> D2 --> UI
+        AF --> TABLE
+        T1 -->|"click CVE"| MODAL
+    end
+
+    EXP["📤 Export CSV\nFiltered view · all pages"]
+    TABLE --> EXP
+
+    CISA -->|"HTTPS"| F1
+    F5 -->|"open file"| HTML
+
+    style CISA fill:#1e2d45,stroke:#60a5fa,color:#e2e8f0
+    style BP fill:#111827,stroke:#1e2d45,color:#e2e8f0
+    style HTML fill:#111827,stroke:#1e2d45,color:#e2e8f0
+    style UI fill:#1a2234,stroke:#1e2d45,color:#e2e8f0
+    style TABLE fill:#1a2234,stroke:#1e2d45,color:#e2e8f0
+    style MODAL fill:#1a2234,stroke:#1e2d45,color:#e2e8f0
+    style EXP fill:#1e2d45,stroke:#4ade80,color:#e2e8f0
+    style F1 fill:#1a2234,stroke:#60a5fa,color:#e2e8f0
+    style F5 fill:#1a2234,stroke:#4ade80,color:#e2e8f0
+    style D1 fill:#0c1929,stroke:#38bdf8,color:#e2e8f0
+    style AF fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- FILE BREAKDOWN -->
+<section id="files">
+  <div class="section-label">Files</div>
+  <h2>File Breakdown</h2>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="file-header">
+        <div class="file-icon py">🐍</div>
+        <div>
+          <div class="file-name">build.py</div>
+          <div class="file-size">~50 KB · 1,025 lines · Python 3.7+</div>
+        </div>
+      </div>
+      <ul class="file-responsibilities">
+        <li>Fetches live KEV JSON from CISA with full cache-busting (timestamp + nonce + headers)</li>
+        <li>Validates payload completeness — declared count vs actual entries</li>
+        <li>Sorts all vulnerabilities newest-first before embedding</li>
+        <li>Injects the JSON and catalog metadata into the HTML template</li>
+        <li>Prints 3 newest entries to terminal so you can confirm freshness</li>
+        <li>Falls back to local <code>kev.json</code> if network is unavailable</li>
+        <li>No third-party packages — stdlib only (<code>urllib</code>, <code>json</code>, <code>ssl</code>)</li>
+      </ul>
+    </div>
+    <div class="file-card">
+      <div class="file-header">
+        <div class="file-icon html">🌐</div>
+        <div>
+          <div class="file-name">cisa-kev-browser.html</div>
+          <div class="file-size">~1.1 MB · all-in-one · zero dependencies</div>
+        </div>
+      </div>
+      <ul class="file-responsibilities">
+        <li>Embeds the entire KEV catalog as an inline JS constant — no runtime fetch</li>
+        <li>Full-text search across 7 fields simultaneously</li>
+        <li>5 filter dimensions: vendor, ransomware, CWE, date from, date to</li>
+        <li>5 sortable columns with toggle asc/desc</li>
+        <li>Detail modal with full metadata, references, and prev/next navigation</li>
+        <li>CSV export of any filtered view</li>
+        <li>Dark/light mode, overdue row highlighting, data-age warning banner</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- DATA FLOW TABLE -->
+<section>
+  <div class="section-label">Data Flow</div>
+  <h2>Step-by-Step Execution</h2>
+  <table class="flow-table">
+    <thead>
+      <tr>
+        <th>Step</th><th>Actor</th><th>Action</th><th>Output</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>build.py</td>
+        <td>Construct cache-busted URL with Unix timestamp + random nonce</td>
+        <td><code>CISA_URL?_=1744034291&amp;nocache=873227</code></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>build.py</td>
+        <td>HTTP GET with no-cache headers + fresh SSL context</td>
+        <td>Raw JSON bytes from CISA CDN</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>build.py</td>
+        <td>Parse JSON, cross-check <code>count</code> vs <code>len(vulnerabilities)</code></td>
+        <td>Validated catalog dict</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>build.py</td>
+        <td>Sort <code>vulnerabilities[]</code> by <code>dateAdded</code> descending</td>
+        <td>Newest entry at index [0]</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>build.py</td>
+        <td>Serialize to compact JSON, inject into HTML template via token replacement</td>
+        <td><code>cisa-kev-browser.html</code> written to disk</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Browser</td>
+        <td>Parse <code>const CATALOG = {...}</code> on page load</td>
+        <td>1,558+ objects in memory</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Browser</td>
+        <td>Populate vendor + CWE dropdowns, set latest-entry stat</td>
+        <td>UI ready state</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Browser</td>
+        <td>Run <code>applyFilters()</code> → <code>sort()</code> → <code>renderPage()</code></td>
+        <td>First 50 rows rendered, newest CVE visible at row 1</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>User</td>
+        <td>Type in search, change dropdowns, click column headers</td>
+        <td>Instant in-memory filter/sort — no network</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>User</td>
+        <td>Click CVE ID → detail modal opens</td>
+        <td>Full metadata, NVD/CISA/vendor links, ← → navigation</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider"/>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Capabilities</div>
+  <h2>Features</h2>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🔍</div>
+      <div class="feat-title">Full-Text Search</div>
+      <div class="feat-body">Searches CVE ID, vendor, product, vulnerability name, short description, CWE codes, and notes simultaneously as you type.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🎛</div>
+      <div class="feat-title">Multi-Dimension Filters</div>
+      <div class="feat-body">Filter by vendor/project, ransomware campaign use (Known/Unknown), CWE code, and date-added range. Combine filters freely. Remove with one-click chips.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">↕</div>
+      <div class="feat-title">Sortable Columns</div>
+      <div class="feat-body">Click any column header to sort ascending or descending. Columns: CVE ID, Vendor, Product, Date Added (default: newest first), Due Date.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📋</div>
+      <div class="feat-title">Detail Modal</div>
+      <div class="feat-body">Full metadata for every CVE — description, required action, due date with overdue indicator, CWE links (MITRE), NVD link, CISA link, vendor advisory links.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📤</div>
+      <div class="feat-title">CSV Export</div>
+      <div class="feat-body">Export the current filtered view — all matching records, not just the visible page — with 10 fields including description and required action.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌙</div>
+      <div class="feat-title">Dark / Light Mode</div>
+      <div class="feat-body">Respects your system preference on first load. Toggle any time with the header button. Theme is applied instantly with no flash.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔴</div>
+      <div class="feat-title">Overdue Highlighting</div>
+      <div class="feat-body">Rows with past-due remediation dates are highlighted in red. Upcoming deadlines within 14 days show an amber countdown label.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚠️</div>
+      <div class="feat-title">Data Age Warning</div>
+      <div class="feat-body">A yellow banner appears automatically if the embedded catalog is more than 30 days old, prompting you to re-run <code>build.py</code>.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📡</div>
+      <div class="feat-title">Always Latest Data</div>
+      <div class="feat-body"><code>build.py</code> defeats CDN caching with timestamp + nonce URLs and no-cache headers, guaranteeing a fresh pull from CISA on every run.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- QUICK START -->
+<section id="quickstart">
+  <div class="section-label">Usage</div>
+  <h2>Quick Start</h2>
+  <div class="qs-steps">
+    <div class="qs-step">
+      <div class="qs-num">1</div>
+      <div class="qs-content">
+        <div class="qs-title">Download the two files</div>
+        <div class="qs-body">Save <code>build.py</code> and <code>cisa-kev-browser.html</code> into the same folder.</div>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-num">2</div>
+      <div class="qs-content">
+        <div class="qs-title">Run <code>build.py</code> to pull the latest KEV data</div>
+        <div class="qs-body">Requires Python 3.7+ and an internet connection. No pip installs needed.</div>
+        <div class="code-block">python3 build.py
+
+<span class="code-comment">✓ Downloaded 1,558 vulnerabilities
+  Catalog:  v2026.04.06  (released 2026-04-06)
+  Newest entries:
+    2026-04-06  CVE-2026-35616        Fortinet
+    2026-04-02  CVE-2026-3502         TrueConf
+    2026-04-01  CVE-2026-5281         Google
+
+✓ Done!  Output: cisa-kev-browser.html</span></div>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-num">3</div>
+      <div class="qs-content">
+        <div class="qs-title">Open the HTML in any browser</div>
+        <div class="qs-body">Double-click <code>cisa-kev-browser.html</code>, or:</div>
+        <div class="code-block"><span class="code-comment"># macOS</span>
+open cisa-kev-browser.html
+
+<span class="code-comment"># Windows</span>
+start cisa-kev-browser.html
+
+<span class="code-comment"># Linux</span>
+xdg-open cisa-kev-browser.html</div>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-num">4</div>
+      <div class="qs-content">
+        <div class="qs-title">Update anytime CISA adds new CVEs</div>
+        <div class="qs-body">Just re-run <code>build.py</code> and reload the HTML. No other steps needed.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- KEYBOARD SHORTCUTS -->
+<section>
+  <div class="section-label">Shortcuts</div>
+  <h2>Keyboard Shortcuts</h2>
+  <div class="kbd-grid">
+    <div class="kbd-item"><kbd>Ctrl</kbd>+<kbd>K</kbd><span class="kbd-desc">Focus search bar</span></div>
+    <div class="kbd-item"><kbd>Esc</kbd><span class="kbd-desc">Close detail modal</span></div>
+    <div class="kbd-item"><kbd>←</kbd><span class="kbd-desc">Previous CVE in modal</span></div>
+    <div class="kbd-item"><kbd>→</kbd><span class="kbd-desc">Next CVE in modal</span></div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- DATA SOURCE -->
+<section>
+  <div class="section-label">Data</div>
+  <h2>Data Source</h2>
+  <table class="flow-table">
+    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Source</td><td><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">CISA Known Exploited Vulnerabilities Catalog</a></td></tr>
+      <tr><td>JSON Feed URL</td><td><code>https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json</code></td></tr>
+      <tr><td>Update Frequency</td><td>Multiple times per week</td></tr>
+      <tr><td>Format</td><td>JSON — fields: cveID, vendorProject, product, vulnerabilityName, dateAdded, dueDate, knownRansomwareCampaignUse, cwes, shortDescription, requiredAction, notes</td></tr>
+      <tr><td>Schema</td><td><a href="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities_schema.json" target="_blank" rel="noopener">CISA KEV JSON Schema</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    Data sourced from the
+    <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">CISA Known Exploited Vulnerabilities Catalog</a>.
+    Not affiliated with or endorsed by CISA or the U.S. Government.
+  </p>
+  <p style="margin-top:.5rem">Built with Python 3 · Vanilla JS · Zero runtime dependencies</p>
+</footer>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    background:       '#111827',
+    primaryColor:     '#1e2d45',
+    primaryTextColor: '#e2e8f0',
+    primaryBorderColor:'#1e2d45',
+    lineColor:        '#60a5fa',
+    secondaryColor:   '#1a2234',
+    tertiaryColor:    '#0b0f18',
+    edgeLabelBackground:'#111827',
+    clusterBkg:       '#111827',
+    clusterBorder:    '#1e2d45',
+    titleColor:       '#94a3b8',
+    nodeTextColor:    '#e2e8f0',
+    fontFamily:       'Geist, Inter, system-ui, sans-serif',
+    fontSize:         '13px',
+  },
+  flowchart: {
+    curve: 'basis',
+    padding: 20,
+    nodeSpacing: 40,
+    rankSpacing: 50,
+  }
+});
+
+// Smooth nav link scrolling offset compensation
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    const offset = 72;
+    window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
