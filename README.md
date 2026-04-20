@@ -11,7 +11,7 @@
 
 **Detail modal** — full metadata, required action, reference links, and prev/next navigation
 
-![CISA KEV Browser — Detail Modal](docs/screenshot-modal.png)
+![CISA KEV Browser — Detail Modal](docs/screenshot-modal-dark.png)
 
 ---
 
