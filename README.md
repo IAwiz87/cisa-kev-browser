@@ -1,5 +1,10 @@
 # 🛡️ CISA KEV Browser
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/)
+[![Data](https://img.shields.io/badge/Data-CISA%20KEV-red.svg)](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)
+[![Part of CyberForge](https://img.shields.io/badge/Part%20of-CyberForge-darkblue.svg)](https://github.com/IAwiz87/CyberForge)
+
 > A fully **standalone, offline-capable** browser for the [CISA Known Exploited Vulnerabilities (KEV) Catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog).  
 > No server. No install. No dependencies. Just open `cisa-kev-browser.html` in any browser.
 
