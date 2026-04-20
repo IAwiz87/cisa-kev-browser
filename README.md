@@ -5,6 +5,22 @@
 
 ---
 
+## Preview
+
+**Main catalog view — dark mode** (newest CVE at the top, sortable columns, live stats bar)
+
+![CISA KEV Browser — Dark Mode](docs/screenshot-dark.png)
+
+**Main catalog view — light mode**
+
+![CISA KEV Browser — Light Mode](docs/screenshot-light.png)
+
+**Detail modal** — full metadata, required action, reference links, and prev/next navigation
+
+![CISA KEV Browser — Detail Modal](docs/screenshot-modal.png)
+
+---
+
 ## 📦 What's in this repo
 
 | File | Purpose |
